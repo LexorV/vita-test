@@ -14,9 +14,35 @@ declare module 'vue' {
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create({ baseURL: 'https://api.example.com' });
+// Base URLs are proxied via devServer proxy in quasar.config.ts
+// - Auth:   '/auth' → https://91.220.155.234:8080/FrontTestingService-auth
+// - Backend '/api'  → http://91.220.155.234:8080/FrontTestingService-back
+const api = axios.create({ baseURL: '/api' });
+axios.defaults.withCredentials = true;
+api.defaults.withCredentials = true;
 
-export default defineBoot(({ app }) => {
+// Perform login on app start using LOGIN and PASSOWRD from environment
+async function performInitialLogin(): Promise<void> {
+  const username = (process.env.LOGIN as string) || '';
+  const password = (process.env.PASSWORD as string) || '';
+  if (!username || !password) return;
+  try {
+    await axios.post(`/auth/login`, null, {
+      params: {
+        username,
+        password,
+      },
+      withCredentials: true,
+    });
+  } catch {
+    console.log('Auth login failed');
+    // swallow error to not block app boot; real app should handle/notify
+    // console.error('Auth login failed', err);
+  }
+}
+
+export default defineBoot(async ({ app }) => {
+  await performInitialLogin();
   // for use inside Vue files (Options API) through this.$axios and this.$api
 
   app.config.globalProperties.$axios = axios;

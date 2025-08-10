@@ -10,9 +10,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import type { Todo, Meta } from 'components/models';
 import ExampleComponent from 'components/ExampleComponent.vue';
+import { api } from 'src/boot/axios';
 
 const todos = ref<Todo[]>([
   {
@@ -36,6 +37,11 @@ const todos = ref<Todo[]>([
     content: 'ct5',
   },
 ]);
+
+onMounted(async () => {
+  const response = await api.get('/userInfo/findAll');
+  console.log(response.data);
+});
 
 const meta = ref<Meta>({
   totalCount: 1200,

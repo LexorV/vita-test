@@ -2,6 +2,8 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
 import { defineConfig } from '#q-app/wrappers';
+import { config as loadEnv } from 'dotenv';
+loadEnv();
 
 export default defineConfig((/* ctx */) => {
   return {
@@ -52,7 +54,10 @@ export default defineConfig((/* ctx */) => {
 
       // publicPath: '/',
       // analyze: true,
-      // env: {},
+      env: {
+        LOGIN: process.env.LOGIN,
+        PASSWORD: process.env.PASSWORD,
+      },
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,
@@ -81,6 +86,21 @@ export default defineConfig((/* ctx */) => {
     devServer: {
       // https: true,
       open: true, // opens browser window automatically
+      proxy: {
+        '/auth': {
+          target: 'http://91.220.155.234:8080/FrontTestingService-auth',
+          changeOrigin: true,
+          secure: false,
+          cookieDomainRewrite: '',
+          rewrite: (path) => path.replace(/^\/auth/, ''),
+        },
+        '/api': {
+          target: 'http://91.220.155.234:8080/FrontTestingService-back',
+          changeOrigin: true,
+          cookieDomainRewrite: '',
+          rewrite: (path) => path.replace(/^\/api/, ''),
+        },
+      },
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
