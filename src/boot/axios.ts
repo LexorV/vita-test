@@ -14,10 +14,11 @@ declare module 'vue' {
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-// Base URLs are proxied via devServer proxy in quasar.config.ts
-// - Auth:   '/auth' → https://91.220.155.234:8080/FrontTestingService-auth
-// - Backend '/api'  → http://91.220.155.234:8080/FrontTestingService-back
-const api = axios.create({ baseURL: '/api' });
+// В деве запросы идут через devServer proxy, в проде (GitHub Pages) — через абсолютные URL
+const apiBaseUrl = (process.env.API_BASE_URL as string) || '/api';
+const authBaseUrl = (process.env.AUTH_BASE_URL as string) || '/auth';
+
+const api = axios.create({ baseURL: apiBaseUrl });
 axios.defaults.withCredentials = true;
 api.defaults.withCredentials = true;
 
@@ -27,7 +28,7 @@ async function performInitialLogin(): Promise<void> {
   const password = (process.env.PASSWORD as string) || '';
   if (!username || !password) return;
   try {
-    await axios.post(`/auth/login`, null, {
+    await axios.post(`${authBaseUrl}/login`, null, {
       params: {
         username,
         password,

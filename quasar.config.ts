@@ -46,6 +46,8 @@ export default defineConfig((/* ctx */) => {
       },
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
+      // База для статического хостинга (GitHub Pages). В GitHub Actions зададим PUBLIC_PATH
+      publicPath: process.env.PUBLIC_PATH ?? '/',
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
@@ -57,6 +59,8 @@ export default defineConfig((/* ctx */) => {
       env: {
         LOGIN: process.env.LOGIN,
         PASSWORD: process.env.PASSWORD,
+        API_BASE_URL: process.env.API_BASE_URL,
+        AUTH_BASE_URL: process.env.AUTH_BASE_URL,
       },
       // rawDefine: {}
       // ignorePublicFolder: true,
