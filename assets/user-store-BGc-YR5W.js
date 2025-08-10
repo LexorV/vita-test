@@ -1,0 +1,1 @@
+import{V as e}from"./index-DlmhaCa1.js";const t=e("user",{state:()=>({currentUser:null}),getters:{hasCurrentUser:r=>!!r.currentUser},actions:{setCurrentUser(r){this.currentUser=r},clearCurrentUser(){this.currentUser=null}}});export{t as u};
