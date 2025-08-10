@@ -1,4 +1,4 @@
-import { defineStore, acceptHMRUpdate } from 'pinia';
+import { defineStore } from 'pinia';
 import type { User } from 'src/types/types';
 
 export const useUserStore = defineStore('user', {
@@ -20,6 +20,6 @@ export const useUserStore = defineStore('user', {
   },
 });
 
-if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useUserStore, import.meta.hot));
-}
+// if (import.meta.hot) {
+//   import.meta.hot.accept(acceptHMRUpdate(useUserStore, import.meta.hot));
+// }

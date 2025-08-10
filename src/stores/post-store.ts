@@ -1,4 +1,4 @@
-import { defineStore, acceptHMRUpdate } from 'pinia';
+import { defineStore } from 'pinia';
 import { api } from 'src/boot/axios';
 import type { PostForUser, User } from 'src/types/types';
 
@@ -71,6 +71,6 @@ export const usePostStore = defineStore('post', {
   },
 });
 
-if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(usePostStore, import.meta.hot));
-}
+// if (import.meta.hot) {
+//   import.meta.hot.accept(acceptHMRUpdate(usePostStore, import.meta.hot));
+// }
