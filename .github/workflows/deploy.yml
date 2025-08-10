@@ -31,8 +31,8 @@ jobs:
       - name: Build
         env:
           PUBLIC_PATH: /${{ github.event.repository.name }}/
-          API_BASE_URL: http://91.220.155.234:8080/FrontTestingService-back
-          AUTH_BASE_URL: http://91.220.155.234:8080/FrontTestingService-auth
+          API_BASE_URL: https://vita-proxy.proxy-lex-test.workers.dev/api
+          AUTH_BASE_URL: https://vita-proxy.proxy-lex-test.workers.dev/auth
         run: npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
