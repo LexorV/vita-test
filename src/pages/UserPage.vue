@@ -1,39 +1,52 @@
 <template>
   <q-page padding>
     <UserCard v-if="hasCurrentUser" />
+    <div v-else class="q-pa-md">Пользователь не найден</div>
   </q-page>
-  <div v-if="!hasCurrentUser" class="q-pa-md">Пользователь не найден</div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { UserCard } from 'src/widgets';
 import { useUserStore } from 'src/stores/user-store';
+import { usePostStore } from 'src/stores/post-store';
 import { storeToRefs } from 'pinia';
+import { Notify } from 'quasar';
 
 const route = useRoute();
-const router = useRouter();
 
 const userStore = useUserStore();
 const { hasCurrentUser } = storeToRefs(userStore);
+const postStore = usePostStore();
 
-function loadUser(idParam: string | string[] | undefined) {
+async function loadUser(idParam: string | string[] | undefined) {
   const id = Array.isArray(idParam) ? idParam[0] : idParam;
-  if (!id) {
-    void router.replace('/');
-    return;
-  }
-  if (!userStore.hasCurrentUser || String(userStore.currentUser?.id) !== String(id)) {
-    void router.replace('/');
-    return;
+  if (!id) return;
+
+  const numericId = Number(id);
+
+  if (!userStore.currentUser || userStore.currentUser.id !== numericId) {
+    if (!postStore.isLoaded) {
+      try {
+        await postStore.fetchAllPosts();
+      } catch {
+        Notify.create({ type: 'negative', message: 'Не удалось загрузить список записей' });
+      }
+    }
+    const user = postStore.getUserById(numericId);
+    userStore.setCurrentUser(user);
   }
 }
 
-onMounted(() => loadUser(route.params.id));
+onMounted(() => {
+  void loadUser(route.params.id);
+});
 watch(
   () => route.params.id,
-  (newId) => loadUser(newId),
+  (newId) => {
+    void loadUser(newId);
+  },
 );
 
 onBeforeUnmount(() => {

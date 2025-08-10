@@ -11,6 +11,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'change-post/:id', component: () => import('pages/ChangePost.vue') },
       { path: 'create-user', component: () => import('pages/CreateUserPage.vue') },
       { path: 'user/:id', component: () => import('pages/UserPage.vue') },
+      { path: 'post/:id', component: () => import('pages/PostPage.vue') },
     ],
   },
 

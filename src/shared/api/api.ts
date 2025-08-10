@@ -18,7 +18,7 @@ export type PostComment = {
   email: string;
   textComment: string;
   userInfo: string;
-  dateTime: string; // ISO
+  dateTime: string;
 };
 
 export type PostResponse = {
@@ -27,7 +27,7 @@ export type PostResponse = {
   briefDescription: string;
   fullDescription?: string;
   userInfoId: number;
-  dateTime: string; // ISO
+  dateTime: string;
   comments: PostComment[];
 };
 

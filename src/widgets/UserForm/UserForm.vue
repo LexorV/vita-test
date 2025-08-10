@@ -61,7 +61,6 @@ type CreateUserRequest = {
   fullName: string;
 };
 
-// Документируем ожидаемый ответ (по вашему примеру из Swagger)
 type CommentDto = {
   dateTime: string;
   email: string;

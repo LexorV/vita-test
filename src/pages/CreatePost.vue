@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page-spacer">
     <PostForm :is-edit="false" />
   </div>
 </template>
@@ -8,4 +8,8 @@
 import { PostForm } from 'src/widgets';
 </script>
 
-<style scoped></style>
+<style scoped>
+.page-spacer {
+  margin-top: 24px;
+}
+</style>

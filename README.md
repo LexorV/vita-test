@@ -1,43 +1,86 @@
-# vita-test (vita-test)
+# vita-test
 
-A Quasar Project
+Проект на Vue 3 + Quasar.
 
-## Install the dependencies
+## Требования
+
+- Node.js 18+ (рекомендуется LTS)
+- npm или yarn
+
+## Установка зависимостей
 
 ```bash
-yarn
-# or
 npm install
+# или
+yarn
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+## (Опционально) Автовход
 
-```bash
-quasar dev
+Создайте файл `.env` в корне проекта со значениями:
+
+```
+LOGIN=ваш_логин
+PASSWORD=ваш_пароль
 ```
 
-### Lint the files
+Эти переменные используются в `src/boot/axios.ts` для автоматического входа при старте приложения.
+
+## Запуск в режиме разработки
 
 ```bash
-yarn lint
-# or
+npm run dev
+# или
+yarn dev
+```
+
+- Браузер откроется автоматически.
+- Прокси на dev-сервере настроены в `quasar.config.ts`:
+  - `/api` → бекенд `http://91.220.155.234:8080/FrontTestingService-back`
+  - `/auth` → сервис авторизации `http://91.220.155.234:8080/FrontTestingService-auth`
+- Роутер работает в режиме `hash`.
+
+## Сборка на продакшн
+
+```bash
+npm run build
+# или
+yarn build
+```
+
+## Линт и форматирование
+
+```bash
 npm run lint
-```
-
-### Format the files
-
-```bash
-yarn format
-# or
 npm run format
 ```
 
-### Build the app for production
+## Краткие возможности
 
-```bash
-quasar build
-```
+- Список постов на главной странице
+- Просмотр поста с полным описанием и комментариями
+- Добавление и удаление комментариев к посту
+- Создание и редактирование постов
+- Список пользователей
+- Просмотр карточки пользователя
+- Создание пользователя
 
-### Customize the configuration
+## Основные маршруты
 
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
+- `/` — главная (список постов)
+- `/post/:id` — страница поста
+- `/create-post` — создание поста
+- `/change-post/:id` — редактирование поста
+- `/users` — список пользователей
+- `/user/:id` — карточка пользователя
+- `/create-user` — создание пользователя
+
+## Полезные файлы
+
+- Маршруты: `src/router/routes.ts`
+- Настройки прокси и окружения: `quasar.config.ts`
+- Axios и автологин: `src/boot/axios.ts`
+
+## Технологии
+
+Vue 3, Quasar, Pinia, Vue Router, Axios.

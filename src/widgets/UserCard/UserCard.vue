@@ -15,21 +15,14 @@
 
     <q-list separator>
       <template v-if="user.post && user.post.length">
-        <q-item v-for="post in user.post" :key="post.id" class="q-py-md">
-          <q-item-section>
-            <div class="row items-center justify-between q-mb-xs">
-              <div class="col">
-                <div class="text-subtitle1">{{ post.title }}</div>
-                <div class="text-caption text-grey-7">Автор: {{ user.fullName }}</div>
-              </div>
-              <div class="col-auto text-caption text-grey-6">Дата: {{ post.dateTime }}</div>
-            </div>
-            <div class="text-body2">{{ post.briefDescription }}</div>
-            <div class="q-mt-sm text-caption text-grey-7">
-              Комментариев: {{ post.comments?.length ?? 0 }}
-            </div>
-          </q-item-section>
-        </q-item>
+        <PostComponent
+          v-for="post in user.post"
+          :key="post.id"
+          :post="post"
+          :author="user.fullName"
+          :show-actions="true"
+          @deleted="onPostDeleted"
+        />
       </template>
       <template v-else>
         <div class="q-pa-md text-grey-6">У пользователя пока нет записей</div>
@@ -44,6 +37,7 @@ import { storeToRefs } from 'pinia';
 import { useUserStore } from 'src/stores/user-store';
 import { usePostStore } from 'src/stores/post-store';
 import { useRouter } from 'vue-router';
+import { PostComponent } from 'src/entities';
 
 const userStore = useUserStore();
 const { currentUser } = storeToRefs(userStore);
@@ -56,6 +50,11 @@ const router = useRouter();
 function goCreatePost() {
   postStore.setTargetUserId(user.value.id);
   void router.push({ path: '/create-post' });
+}
+
+function onPostDeleted(id: number) {
+  const updated = user.value.post.filter((p) => p.id !== id);
+  user.value.post.splice(0, user.value.post.length, ...updated);
 }
 </script>
 

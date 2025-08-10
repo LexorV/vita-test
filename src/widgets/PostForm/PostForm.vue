@@ -1,69 +1,93 @@
 <template>
-  <q-form @submit.prevent="onSubmit" @reset.prevent="onReset" ref="formRef" class="q-gutter-md">
-    <q-input v-model="formData.userInfoId" label="Пользователь" outlined :disable="true" />
-    <q-input
-      v-model="formData.title"
-      label="Заголовок"
-      :rules="[rules.required, rules.max50]"
-      outlined
-      clearable
-      :disable="submitting"
-    />
+  <q-card class="form-card" bordered>
+    <q-card-section class="row items-center q-gutter-sm">
+      <q-icon name="article" color="primary" size="28px" />
+      <div class="text-h6">{{ isEdit ? 'Редактирование поста' : 'Создание поста' }}</div>
+    </q-card-section>
 
-    <q-input
-      v-model="formData.briefDescription"
-      label="Краткое описание"
-      :rules="[rules.required, rules.max100]"
-      type="textarea"
-      autogrow
-      outlined
-      clearable
-      :disable="submitting"
-    />
+    <q-separator spaced />
 
-    <q-input
-      v-model="formData.fullDescription"
-      label="Полное описание"
-      :rules="[rules.max255]"
-      type="textarea"
-      autogrow
-      outlined
-      clearable
-      :disable="submitting"
-    />
+    <q-card-section>
+      <q-form @submit.prevent="onSubmit" @reset.prevent="onReset" ref="formRef" class="q-gutter-md">
+        <q-input
+          v-model="formData.title"
+          label="Заголовок"
+          :rules="[rules.required, rules.max50]"
+          outlined
+          clearable
+          :disable="submitting"
+          maxlength="50"
+          hint="До 50 символов"
+        >
+          <template #prepend>
+            <q-icon name="title" />
+          </template>
+        </q-input>
 
-    <div class="row q-col-gutter-md">
-      <div class="col-auto">
-        <q-btn
-          :label="isEdit ? 'Сохранить' : 'Создать'"
-          type="submit"
-          color="secondary"
-          :loading="submitting"
-        />
-      </div>
-      <div class="col-auto">
-        <q-btn label="Сбросить" type="reset" color="secondary" flat :disable="submitting" />
-      </div>
-    </div>
-  </q-form>
+        <q-input
+          v-model="formData.briefDescription"
+          label="Краткое описание"
+          :rules="[rules.required, rules.max100]"
+          type="textarea"
+          autogrow
+          outlined
+          clearable
+          :disable="submitting"
+          maxlength="100"
+          hint="Краткий текст, до 100 символов"
+        >
+          <template #prepend>
+            <q-icon name="short_text" />
+          </template>
+        </q-input>
+
+        <q-input
+          v-model="formData.fullDescription"
+          label="Полное описание"
+          :rules="[rules.max255]"
+          type="textarea"
+          autogrow
+          outlined
+          clearable
+          :disable="submitting"
+          maxlength="255"
+          hint="Раскройте подробности, до 255 символов"
+        >
+          <template #prepend>
+            <q-icon name="description" />
+          </template>
+        </q-input>
+
+        <q-card-actions align="right" class="q-pa-none">
+          <q-btn
+            :label="isEdit ? 'Сохранить' : 'Создать'"
+            type="submit"
+            color="primary"
+            :loading="submitting"
+            icon="save"
+            unelevated
+          />
+        </q-card-actions>
+      </q-form>
+    </q-card-section>
+
+    <q-inner-loading :showing="submitting">
+      <q-spinner size="42px" color="primary" />
+    </q-inner-loading>
+  </q-card>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { Notify, type QForm } from 'quasar';
-import {
-  createPost,
-  updatePost,
-  type CreatePostRequest,
-  type UpdatePostRequest,
-} from './api/PostApi';
-// import { api } from 'src/boot/axios';
+import { createPost, updatePost } from 'src/shared/api/api';
+import type { CreatePostRequest, UpdatePostRequest } from 'src/shared/api/api';
 import { usePostStore } from 'src/stores/post-store';
 
 const props = withDefaults(
   defineProps<{
     isEdit: boolean;
-    // при редактировании нужно передать id и стартовые значения
     initialId?: number;
     initialTitle?: string;
     initialBriefDescription?: string;
@@ -81,6 +105,7 @@ const formRef = ref<QForm | null>(null);
 const submitting = ref(false);
 
 const postStore = usePostStore();
+const router = useRouter();
 
 const formData = reactive<{
   userInfoId: number | null;
@@ -116,6 +141,13 @@ async function onSubmit() {
   const validationResult = formRef.value.validate();
   const valid = typeof validationResult === 'boolean' ? validationResult : await validationResult;
   if (!valid) return;
+  if (
+    !props.isEdit &&
+    (formData.userInfoId === null || Number.isNaN(Number(formData.userInfoId)))
+  ) {
+    Notify.create({ type: 'negative', message: 'Не выбран пользователь' });
+    return;
+  }
   submitting.value = true;
   try {
     if (props.isEdit) {
@@ -127,6 +159,8 @@ async function onSubmit() {
       };
       await updatePost(payload);
       Notify.create({ type: 'positive', message: 'Запись обновлена' });
+      postStore.invalidatePosts();
+      navigateBack();
     } else {
       const payload: CreatePostRequest = {
         title: formData.title.trim(),
@@ -135,12 +169,12 @@ async function onSubmit() {
       };
       await createPost(payload, Number(formData.userInfoId));
       Notify.create({ type: 'positive', message: 'Запись создана' });
-      onReset();
+      postStore.invalidatePosts();
+      navigateBack();
     }
   } catch (error) {
     console.error(error);
     Notify.create({ type: 'negative', message: 'Ошибка запроса' });
-    // Можно расширить обработку ошибок при необходимости
   } finally {
     submitting.value = false;
   }
@@ -152,10 +186,19 @@ function onReset() {
   formData.briefDescription = '';
   formData.fullDescription = '';
 }
+
+function navigateBack() {
+  if (typeof window !== 'undefined' && window.history.length > 1) {
+    void router.back();
+  } else {
+    void router.push('/');
+  }
+}
 </script>
 
 <style scoped>
-.q-form {
-  max-width: 640px;
+.form-card {
+  max-width: 760px;
+  margin: 0 auto;
 }
 </style>

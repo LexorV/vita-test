@@ -36,7 +36,6 @@ async function onDelete() {
     await api.delete(`/userInfo/${user.value.id}`);
     emit('deleted', user.value.id);
   } catch (err) {
-    // В реальном приложении: нотификация об ошибке
     console.error('Не удалось удалить пользователя', err);
   }
 }
